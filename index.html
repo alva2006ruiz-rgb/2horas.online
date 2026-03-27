@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>2horas.online | Tu Web en 2 Horas</title>
+   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+   
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  
+   <script id="tailwind-config">
+       tailwind.config = {
+           darkMode: "class",
+           theme: {
+               extend: {
+                   colors: {
+                       "surface": "#05050A",
+                       "surface-container-lowest": "#0A0B14",
+                       "surface-container-low": "#0F121F",
+                       "surface-container": "#15192B",
+                       "surface-container-high": "#1E233B",
+                       "surface-container-highest": "#282E4D",
+                       "surface-bright": "#15192B",
+                       "on-surface": "#FFFFFF",
+                       "on-surface-variant": "#94A3B8",
+                       
+                       "primary": "#0057FF",
+                       "on-primary": "#FFFFFF",
+                       "primary-container": "#003BCC",
+                       "on-primary-container": "#E0E7FF",
+                       "primary-fixed": "#00F0FF",
+                       "on-primary-fixed-variant": "#003BCC",
+                       
+                       "secondary": "#00F0FF",
+                       "on-secondary": "#000000",
+                       "secondary-container": "#008A99",
+                       
+                       "outline": "#475569",
+                       "outline-variant": "#1E233B",
+                       
+                       "error": "#FF2E54",
+                       "error-container": "#4C0519",
+                   },
+                   fontFamily: {
+                       "headline": ["'Space Grotesk'", "sans-serif"],
+                       "body": ["Inter", "sans-serif"],
+                       "label": ["Inter", "sans-serif"]
+                   },
+                   borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "3xl": "1.5rem", "full": "9999px"},
+                   animation: {
+                       'float': 'float 6s ease-in-out infinite',
+                       'glow': 'glow 3s ease-in-out infinite alternate',
+                   },
+                   keyframes: {
+                       float: {
+                           '0%, 100%': { transform: 'translateY(0)' },
+                           '50%': { transform: 'translateY(-15px)' },
+                       },
+                       glow: {
+                           '0%': { opacity: '0.4', filter: 'blur(60px)' },
+                           '100%': { opacity: '0.8', filter: 'blur(90px)' },
+                       }
+                   }
+               },
+           },
+       }
+   </script>
+   <style>
+       .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+       body {
+           background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+           background-size: 30px 30px;
+       }
+       .glass-card {
+           background: rgba(15, 18, 31, 0.7);
+           backdrop-filter: blur(20px);
+           -webkit-backdrop-filter: blur(20px);
+           border: 1px solid rgba(255, 255, 255, 0.1);
+       }
+       .step-hidden { display: none; }
+       .fade-in { animation: fadeIn 0.4s ease-in-out; }
+       @keyframes fadeIn {
+           from { opacity: 0; transform: translateY(10px); }
+           to { opacity: 1; transform: translateY(0); }
+       }
+       .radio-card:checked + div {
+           border-color: #00F0FF; 
+           background-color: rgba(0, 240, 255, 0.05);
+           box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+           transform: translateY(-2px);
+       }
+       .radio-card:checked + div span.material-symbols-outlined {
+           color: #00F0FF;
+           text-shadow: 0 0 10px rgba(0,240,255,0.5);
+       }
+       .radio-card-reject:checked + div {
+           border-color: #FF2E54;
+           background-color: rgba(255, 46, 84, 0.05);
+           box-shadow: 0 0 20px rgba(255, 46, 84, 0.15);
+           transform: translateY(-2px);
+       }
+       ::-webkit-scrollbar { width: 8px; }
+       ::-webkit-scrollbar-track { background: #0A0B14; } 
+       ::-webkit-scrollbar-thumb { background: #282E4D; border-radius: 4px; } 
+       ::-webkit-scrollbar-thumb:hover { background: #0057FF; } 
+   </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-secondary selection:text-on-secondary antialiased">
+
+   <!-- Toast Notification -->
+   <div id="toast" class="fixed top-24 right-4 md:right-8 z-[200] transform transition-all duration-300 translate-x-[150%] opacity-0 bg-error-container border border-error/50 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+       <span class="material-symbols-outlined text-error">error</span>
+       <span id="toastMessage" class="font-body text-sm font-medium"></span>
+   </div>
+
+   <!-- TopNavBar -->
+   <nav class="bg-surface/80 backdrop-blur-xl sticky top-0 z-50 border-b border-surface-container-highest">
+       <div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+           <div class="flex items-center gap-2">
+               <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                   <span class="material-symbols-outlined text-white text-xl">bolt</span>
+               </div>
+               <div class="text-2xl font-black text-on-surface tracking-tighter font-headline">
+                   2horas<span class="text-secondary">.online</span>
+               </div>
+           </div>
+           <div class="hidden md:flex items-center gap-8">
+               <a class="text-on-surface font-bold border-b-2 border-secondary font-headline tracking-tight" href="#como-funciona">El Proceso</a>
+               <a class="text-on-surface-variant hover:text-secondary transition-colors font-headline font-bold tracking-tight" href="#aplicar">Viabilidad</a>
+           </div>
+           <div class="flex items-center gap-4">
+               <a href="#aplicar" class="bg-surface-container text-on-surface px-6 py-2.5 rounded-lg font-bold text-sm font-headline border border-white/10 hover:border-secondary/50 hover:bg-surface-container-high transition-all">
+                   Agendar Sesión
+               </a>
+           </div>
+       </div>
+   </nav>
+
+   <!-- Hero Section -->
+   <section class="relative pt-24 pb-32 px-8 overflow-hidden">
+       <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+           <!-- Glowing Orbs -->
+           <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none animate-glow"></div>
+           <div class="absolute bottom-20 right-0 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px] pointer-events-none animate-glow" style="animation-delay: 1.5s;"></div>
+
+           <!-- Left Content -->
+           <div class="z-10 flex flex-col items-start text-left">
+               <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container text-secondary font-bold text-xs mb-6 border border-secondary/20 tracking-wider">
+                   <span class="relative flex h-2 w-2">
+                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                       <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+                   </span>
+                   AGENCIA CaaS ASISTIDA POR IA
+               </div>
+              
+               <h1 class="font-headline text-5xl md:text-7xl font-extrabold text-on-surface leading-[1.1] tracking-tighter mb-8">
+                   Entras con una idea.<br>
+                   <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Sales en 2 horas con tu web lista.</span>
+               </h1>
+              
+               <p class="font-body text-lg md:text-xl text-on-surface-variant max-w-xl mb-10 leading-relaxed">
+                   Una videollamada intensiva. Diseño profesional, arquitectura de conversión, copywriting por IA y publicada en vivo. Sin semanas de espera ni revisiones infinitas.
+               </p>
+              
+               <!-- BOTONES -->
+               <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                   <button onclick="openModal('qualifyModal')" class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-xl font-bold text-lg font-headline shadow-[0_0_20px_rgba(0,87,255,0.4)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">
+                       Verificar si califico
+                       <span class="material-symbols-outlined text-xl">rule</span>
+                   </button>
+                   <button onclick="openModal('howItWorksModal')" class="bg-surface-container-high text-on-surface px-8 py-4 rounded-xl font-bold text-lg font-headline border border-white/5 hover:bg-surface-container-highest hover:border-white/10 transition-colors flex items-center justify-center w-full sm:w-auto">
+                       Ver cómo funciona
+                   </button>
+               </div>
+           </div>
+
+           <!-- Right Content (Hero Image) -->
+           <div class="relative z-10 w-full h-[400px] lg:h-[600px] rounded-[2.5rem] p-4 lg:p-6 bg-surface-container/50 backdrop-blur-md border border-white/10 animate-float">
+               <div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-secondary/10 rounded-[2.5rem] transform rotate-2 scale-[1.02] -z-10"></div>
+               <img src="https://images.unsplash.com/photo-1559097280-ce4b032b67a6?q=80&w=1470&auto=format&fit=crop" alt="" class="w-full h-full object-cover rounded-[2rem] shadow-2xl grayscale-[30%] brightness-75 contrast-125">
+              
+               <!-- Floating glass badge -->
+               <div class="absolute -left-6 top-1/2 -translate-y-1/2 glass-card p-4 rounded-2xl shadow-2xl max-w-[200px] hidden md:block">
+                   <div class="flex items-center gap-3 mb-2">
+                       <div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+                           <span class="material-symbols-outlined text-secondary text-sm">bolt</span>
+                       </div>
+                       <div class="h-2 w-16 bg-outline-variant rounded-full"></div>
+                   </div>
+                   <div class="space-y-2">
+                       <div class="h-1.5 w-full bg-surface-container-highest rounded-full"></div>
+                       <div class="h-1.5 w-3/4 bg-surface-container-highest rounded-full"></div>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </section>
+
+   <!-- How it works (The Flow) -->
+   <section id="como-funciona" class="py-24 px-8 bg-surface-container-lowest border-y border-surface-container-highest relative">
+       <div class="max-w-7xl mx-auto relative z-10">
+           <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+               <!-- Process Image -->
+               <div class="relative w-full h-[500px] lg:h-[700px] rounded-[2.5rem] overflow-hidden shadow-2xl order-2 lg:order-1 border border-surface-container-highest">
+                   <img src="https://images.unsplash.com/photo-1522086605197-deac1ce7566c?q=80&w=715&auto=format&fit=crop" alt="" class="absolute inset-0 w-full h-full object-cover opacity-70 grayscale-[50%] hover:grayscale-0 transition-all duration-700">
+                   <div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+                  
+                   <div class="absolute bottom-8 left-8 right-8 glass-card p-6 rounded-2xl">
+                       <p class="font-headline font-bold text-on-surface text-xl">Ejecución en vivo</p>
+                       <p class="font-body text-on-surface-variant text-sm mt-1">Sin correos de ida y vuelta ni fricciones. Construimos juntos.</p>
+                   </div>
+               </div>
+
+               <!-- Process Steps -->
+               <div class="order-1 lg:order-2">
+                   <div class="mb-12">
+                       <h2 class="font-headline text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-on-surface">La arquitectura en 3 pasos</h2>
+                       <p class="text-on-surface-variant font-body text-lg">Un proceso productizado y estandarizado para garantizar resultados premium en tiempo récord, usando inteligencia artificial.</p>
+                   </div>
+
+                   <div class="space-y-6 relative">
+                       <div class="absolute left-8 top-10 bottom-10 w-0.5 bg-outline-variant z-0 hidden md:block"></div>
+
+                       <!-- Step 1 -->
+                       <div class="relative z-10 bg-surface-container p-8 rounded-[2rem] border border-white/5 flex flex-col sm:flex-row gap-6 group hover:-translate-y-1 hover:border-secondary/30 transition-all shadow-lg">
+                           <div class="w-16 h-16 shrink-0 rounded-2xl bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                               <span class="material-symbols-outlined text-on-surface-variant text-3xl group-hover:text-secondary">filter_alt</span>
+                           </div>
+                           <div>
+                               <h3 class="font-headline text-2xl font-bold mb-2 text-on-surface">1. Filtro & Pre-Work</h3>
+                               <p class="text-on-surface-variant leading-relaxed font-body">Llenas nuestra solicitud. Si es viable, usamos Claude 3.5 para generar la estructura persuasiva antes de nuestra sesión.</p>
+                           </div>
+                       </div>
+
+                       <!-- Step 2 -->
+                       <div class="relative z-10 bg-surface-container p-8 rounded-[2rem] border border-white/5 flex flex-col sm:flex-row gap-6 group hover:-translate-y-1 hover:border-secondary/30 transition-all shadow-lg">
+                           <div class="w-16 h-16 shrink-0 rounded-2xl bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                               <span class="material-symbols-outlined text-on-surface-variant text-3xl group-hover:text-secondary">schedule</span>
+                           </div>
+                           <div>
+                               <h3 class="font-headline text-2xl font-bold mb-2 text-on-surface">2. Sesión Intensiva</h3>
+                               <p class="text-on-surface-variant leading-relaxed font-body">Videollamada de 2 horas. Aprobamos textos, aplicamos tu marca, utilizamos herramientas No-Code de alta gama y montamos en vivo.</p>
+                           </div>
+                       </div>
+
+                       <!-- Step 3 -->
+                       <div class="relative z-10 bg-surface-container p-8 rounded-[2rem] border border-white/5 flex flex-col sm:flex-row gap-6 group hover:-translate-y-1 hover:border-secondary/30 transition-all shadow-lg">
+                           <div class="w-16 h-16 shrink-0 rounded-2xl bg-surface-container-highest flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                               <span class="material-symbols-outlined text-on-surface-variant text-3xl group-hover:text-secondary">rocket_launch</span>
+                           </div>
+                           <div>
+                               <h3 class="font-headline text-2xl font-bold mb-2 text-on-surface">3. Lanzamiento</h3>
+                               <p class="text-on-surface-variant leading-relaxed font-body">En los últimos 20 minutos conectamos el dominio, probamos integraciones, publicamos y te entregamos las llaves del sitio.</p>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </section>
+
+   <!-- The Filter (Form Section) -->
+   <section id="aplicar" class="py-24 px-8 bg-surface relative">
+       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
+       
+       <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start relative z-10">
+          
+           <!-- Left Side: Text and Form Image -->
+           <div class="lg:col-span-5 flex flex-col h-full lg:sticky lg:top-28">
+               <div class="mb-8">
+                   <h2 class="font-headline text-3xl md:text-5xl font-extrabold tracking-tight mb-4 text-on-surface">Solicitud de Viabilidad</h2>
+                   <p class="text-on-surface-variant font-body text-lg">Para garantizar nuestra promesa de 2 horas, tu proyecto debe cumplir parámetros específicos. Evaluemos tu caso.</p>
+               </div>
+              
+               <div class="relative rounded-[2.5rem] overflow-hidden flex-grow min-h-[400px] shadow-2xl border border-white/10 hidden lg:block">
+                   <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1469&auto=format&fit=crop" alt="" class="absolute inset-0 w-full h-full object-cover grayscale-[40%] brightness-50">
+                   <div class="absolute inset-0 bg-primary/30 mix-blend-overlay"></div>
+                   <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/50 to-transparent"></div>
+               </div>
+           </div>
+
+           <!-- Right Side: Form -->
+           <div class="lg:col-span-7 bg-surface-container/80 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden relative">
+              
+               <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-bl-[100px] pointer-events-none blur-xl"></div>
+
+               <div class="p-8 md:p-12">
+                   <form id="qualifyForm" class="space-y-8 relative z-10" onsubmit="event.preventDefault();">
+                      
+                       <div class="w-full bg-surface-container-highest rounded-full h-2 mb-10 overflow-hidden">
+                           <div class="bg-gradient-to-r from-primary to-secondary h-full transition-all duration-500 ease-out relative" style="width: 33%" id="progressBar">
+                               <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                           </div>
+                       </div>
+
+                       <div id="rejectionMessage" class="hidden text-center py-12 fade-in">
+                           <div class="w-20 h-20 bg-error-container border border-error/30 text-error rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(255,46,84,0.2)]">
+                               <span class="material-symbols-outlined text-4xl">block</span>
+                           </div>
+                           <h3 class="font-headline text-3xl font-extrabold text-on-surface mb-4">No somos el fit ideal</h3>
+                           <p class="font-body text-on-surface-variant text-lg mb-8 max-w-lg mx-auto">Por las características de tu proyecto o tus preferencias de trabajo, una sesión de 2 horas no será suficiente para entregarte la calidad técnica que mereces.</p>
+                           <button type="button" onclick="location.reload()" class="text-secondary font-bold hover:text-white font-headline flex items-center justify-center gap-1 mx-auto transition-colors">
+                               <span class="material-symbols-outlined text-sm">refresh</span> Volver a intentar
+                           </button>
+                       </div>
+
+                       <!-- STEP 1: Viability -->
+                       <div id="step1" class="fade-in">
+                           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-highest text-on-surface font-bold text-xs mb-6 font-headline tracking-wide uppercase border border-white/5">
+                               Sección A: Viabilidad Técnica
+                           </div>
+                          
+                           <div class="mb-10 p-6 bg-surface-container-low rounded-2xl border border-white/5">
+                               <label class="block font-headline text-xl text-on-surface font-bold mb-4">Tus Datos de Contacto</label>
+                               <div class="space-y-4 font-body">
+                                   <div>
+                                       <input type="text" id="nombre" name="nombre" placeholder="Nombre completo *" required class="w-full px-5 py-4 rounded-xl border border-outline-variant bg-surface-bright focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none text-white placeholder:text-gray-500">
+                                   </div>
+                                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                       <input type="email" id="email" name="email" placeholder="Correo electrónico *" required class="w-full px-5 py-4 rounded-xl border border-outline-variant bg-surface-bright focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none text-white placeholder:text-gray-500">
+                                       <input type="tel" id="telefono" name="telefono" placeholder="Teléfono / WhatsApp *" required class="w-full px-5 py-4 rounded-xl border border-outline-variant bg-surface-bright focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none text-white placeholder:text-gray-500">
+                                   </div>
+                               </div>
+                           </div>
+
+                           <div class="mb-8">
+                               <label class="block font-headline text-xl text-on-surface font-bold mb-4">1. ¿Cuál es el objetivo principal de la web?</label>
+                               <div class="space-y-3 font-body">
+                                   <label class="block relative cursor-pointer group">
+                                       <input type="radio" name="q1" value="viable" class="peer sr-only radio-card">
+                                       <div class="p-5 rounded-2xl border border-outline-variant hover:border-outline transition-all bg-surface-bright flex items-center gap-4">
+                                           <span class="material-symbols-outlined text-outline-variant peer-checked:text-secondary transition-colors">hub</span>
+                                           <span class="font-medium text-on-surface-variant peer-checked:text-white">Captar contactos (Leads/WhatsApp)</span>
+                                       </div>
+                                   </label>
+                                   <label class="block relative cursor-pointer group">
+                                       <input type="radio" name="q1" value="viable" class="peer sr-only radio-card">
+                                       <div class="p-5 rounded-2xl border border-outline-variant hover:border-outline transition-all bg-surface-bright flex items-center gap-4">
+                                           <span class="material-symbols-outlined text-outline-variant peer-checked:text-secondary transition-colors">view_quilt</span>
+                                           <span class="font-medium text-on-surface-variant peer-checked:text-white">Mostrar servicios y portafolio</span>
+                                       </div>
+                                   </label>
+                                   <label class="block relative cursor-pointer group">
+                                       <input type="radio" name="q1" value="viable" class="peer sr-only radio-card">
+                                       <div class="p-5 rounded-2xl border border-outline-variant hover:border-outline transition-all bg-surface-bright flex items-center gap-4">
+                                           <span class="material-symbols-outlined text-outline-variant peer-checked:text-secondary transition-colors">shopping_bag</span>
+                                           <span class="font-medium text-on-surface-variant peer-checked:text-white">Vender 1 a 3 productos específicos</span>
+                                       </div>
+                                   </label>
+                                   <label class="block relative cursor-pointer group">
+                                       <input type="radio" name="q1" value="reject" class="peer sr-only radio-card-reject">
+                                       <div class="p-5 rounded-2xl border border-outline-variant hover:border-error-container transition-all bg-surface-bright flex items-center gap-4">
+                                           <span class="material-symbols-outlined text-outline-variant peer-checked:text-error transition-colors">store</span>
+                                           <span class="font-medium text-on-surface-variant peer-checked:text-error">Tienda online compleja (+10 productos)</span>
+                                       </div>
+                                   </label>
+                                   <label class="block relative cursor-pointer group">
+                                       <input type="radio" name="q1" value="reject" class="peer sr-only radio-card-reject">
+                                       <div class="p-5 rounded-2xl border border-outline-variant hover:border-error-container transition-all bg-surface-bright flex items-center gap-4">
+                                           <span class="material-symbols-outlined text-outline-variant peer-checked:text-error transition-colors">account_circle</span>
+                                           <span class="font-medium text-on-surface-variant peer-checked:text-error">Sistema con inicio de sesión / App Web</span>
+                                       </div>
+                                   </label>
+                               </div>
+                           </div>
+
+                           <div class="mb-10">
+                               <label class="block font-headline text-xl text-on-surface font-bold mb-4">2. ¿Tienes un dominio (.com) adquirido?</label>
+                               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-body">
+                                   <label class="block relative cursor-pointer group">
+                                       <input type="radio" name="q2" value="yes" class="peer sr-only radio-card">
+                                       <div class="p-5 rounded-2xl border border-outline-variant hover:border-outline transition-all text-center bg-surface-bright">
+                                           <span class="font-medium text-on-surface-variant peer-checked:text-white">Sí, tengo los accesos</span>
+                                       </div>
+                                   </label>
+                                   <label class="block relative cursor-pointer group">
+                                       <input type="radio" name="q2" value="no" class="peer sr-only radio-card">
+                                       <div class="p-5 rounded-2xl border border-outline-variant hover:border-outline transition-all text-center bg-surface-bright">
+                                           <span class="font-medium text-on-surface-variant peer-checked:text-white">No, necesito asesoría</span>
+                                       </div>
+                                   </label>
+                               </div>
+                           </div>
+
+                           <button type="button" onclick="nextStep(2)" class="w-full bg-white text-surface font-headline font-bold py-4 rounded-xl hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all flex justify-center items-center gap-2">
+                               Continuar Arquitectura
+                               <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                           </button>
+                       </div>
+
+                       <!-- STEP 2: AI Inputs -->
+                       <div id="step2" class="step-hidden fade-in">
+                           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-highest text-on-surface font-bold text-xs mb-6 font-headline tracking-wide uppercase border border-white/5">
+                               Sección B: Insumos de IA
+                           </div>
+                           <p class="font-body text-on-surface-variant mb-8">Esta data entrenará a nuestro modelo (Claude 3.5) para generar tu copywriting de alta conversión antes de la sesión.</p>
+                          
+                           <div class="space-y-8 font-body mb-10">
+                               <div>
+                                   <label class="block font-headline text-lg text-on-surface font-bold mb-3">3. ¿Qué ofreces y a quién ayudas? (1 frase)</label>
+                                   <textarea rows="2" name="q3_oferta" class="w-full px-5 py-4 rounded-2xl border border-outline-variant bg-surface-bright focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none text-white placeholder:text-gray-500" placeholder="Ej: Ayudo a estudios de arquitectura a captar clientes con estrategias digitales."></textarea>
+                               </div>
+
+                               <div>
+                                   <label class="block font-headline text-lg text-on-surface font-bold mb-3">4. Nombra 3 beneficios core de tu servicio</label>
+                                   <div class="space-y-3">
+                                       <div class="relative">
+                                           <span class="absolute left-4 top-4 text-outline font-bold">1.</span>
+                                           <input type="text" name="q4_beneficio1" class="w-full pl-10 pr-5 py-4 rounded-2xl border border-outline-variant bg-surface-bright focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none text-white">
+                                       </div>
+                                       <div class="relative">
+                                           <span class="absolute left-4 top-4 text-outline font-bold">2.</span>
+                                           <input type="text" name="q4_beneficio2" class="w-full pl-10 pr-5 py-4 rounded-2xl border border-outline-variant bg-surface-bright focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none text-white">
+                                       </div>
+                                       <div class="relative">
+                                           <span class="absolute left-4 top-4 text-outline font-bold">3.</span>
+                                           <input type="text" name="q4_beneficio3" class="w-full pl-10 pr-5 py-4 rounded-2xl border border-outline-variant bg-surface-bright focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none text-white">
+                                       </div>
+                                   </div>
+                               </div>
+
+                               <div>
+                                   <label class="block font-headline text-lg text-on-surface font-bold mb-3">5. ¿Cuál es tu ventaja competitiva?</label>
+                                   <input type="text" name="q5_ventaja" class="w-full px-5 py-4 rounded-2xl border border-outline-variant bg-surface-bright focus:border-secondary focus:ring-1 focus:ring-secondary transition-all outline-none text-white placeholder:text-gray-500" placeholder="Tu diferenciador principal...">
+                               </div>
+
+                               <div>
+                                   <label class="block font-headline text-lg text-on-surface font-bold mb-3">6. Identidad visual de marca</label>
+                                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                       <label class="block relative cursor-pointer group">
+                                           <input type="radio" name="q6" value="yes" class="peer sr-only radio-card">
+                                           <div class="p-4 rounded-2xl border border-outline-variant hover:border-outline transition-all text-center bg-surface-bright">
+                                               <span class="font-medium text-on-surface-variant peer-checked:text-white">Tengo logo y paleta definida</span>
+                                           </div>
+                                       </label>
+                                       <label class="block relative cursor-pointer group">
+                                           <input type="radio" name="q6" value="no" class="peer sr-only radio-card">
+                                           <div class="p-4 rounded-2xl border border-outline-variant hover:border-outline transition-all text-center bg-surface-bright">
+                                               <span class="font-medium text-on-surface-variant peer-checked:text-white">Necesito propuesta visual</span>
+                                           </div>
+                                       </label>
+                                   </div>
+                               </div>
+                           </div>
+
+                           <div class="flex gap-4">
+                               <button type="button" onclick="prevStep(1)" class="w-1/3 bg-transparent border border-white/10 hover:border-white/30 text-on-surface-variant hover:text-white font-headline font-bold py-4 rounded-xl transition-colors">Atrás</button>
+                               <button type="button" onclick="nextStep(3)" class="w-2/3 bg-white text-surface font-headline font-bold py-4 rounded-xl hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all flex justify-center items-center gap-2">
+                                   Siguiente Fase
+                                   <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                               </button>
+                           </div>
+                       </div>
+
+                       <!-- STEP 3: Commercial -->
+                       <div id="step3" class="step-hidden fade-in">
+                           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-highest text-on-surface font-bold text-xs mb-6 font-headline tracking-wide uppercase border border-white/5">
+                               Sección C: Compromiso Operativo
+                           </div>
+                          
+                           <div class="space-y-8 font-body mb-10">
+                               <div class="bg-surface-container-low p-6 rounded-2xl border border-white/5">
+                                   <label class="block font-headline text-xl text-on-surface font-bold mb-4">
+                                       7. Este modelo requiere toma de decisiones ágiles. Construiremos en vivo en una sesión de 2 horas. ¿Estás dispuesto a este formato intensivo?
+                                   </label>
+                                   <div class="space-y-3">
+                                       <label class="block relative cursor-pointer group">
+                                           <input type="radio" name="q7" value="viable" class="peer sr-only radio-card">
+                                           <div class="p-4 rounded-xl border border-outline-variant bg-surface-bright transition-all">
+                                               <span class="font-medium text-on-surface-variant peer-checked:text-white">Sí, busco velocidad y eficiencia.</span>
+                                           </div>
+                                       </label>
+                                       <label class="block relative cursor-pointer group">
+                                           <input type="radio" name="q7" value="reject" class="peer sr-only radio-card-reject">
+                                           <div class="p-4 rounded-xl border border-outline-variant bg-surface-bright transition-all">
+                                               <span class="font-medium text-on-surface-variant peer-checked:text-error">No, prefiero un flujo clásico con revisiones.</span>
+                                           </div>
+                                       </label>
+                                   </div>
+                               </div>
+
+                               <div class="bg-surface-container-low p-6 rounded-2xl border border-white/5">
+                                   <label class="block font-headline text-xl text-on-surface font-bold mb-4">
+                                       8. La inversión por esta arquitectura completa es de <span class="text-secondary font-extrabold">$500.000 COP</span>.<br>
+                                       <span class="text-sm text-outline font-normal mt-2 block">(Nota: Este valor NO incluye Dominio ni Hosting, los cuales tienen un costo adicional o puedes traer los tuyos).</span>
+                                       <span class="block mt-4">Si aprobamos tu proyecto hoy, ¿estás listo para agendar tu espacio?</span>
+                                   </label>
+                                   <div class="space-y-3">
+                                       <label class="block relative cursor-pointer group">
+                                           <input type="radio" name="q8" value="viable" class="peer sr-only radio-card">
+                                           <div class="p-4 rounded-xl border border-outline-variant bg-surface-bright transition-all">
+                                               <span class="font-medium text-on-surface-variant peer-checked:text-white">Sí, estoy listo para agendar.</span>
+                                           </div>
+                                       </label>
+                                       <label class="block relative cursor-pointer group">
+                                           <input type="radio" name="q8" value="reject" class="peer sr-only radio-card-reject">
+                                           <div class="p-4 rounded-xl border border-outline-variant bg-surface-bright transition-all">
+                                               <span class="font-medium text-on-surface-variant peer-checked:text-error">No, solo estoy cotizando por ahora.</span>
+                                           </div>
+                                       </label>
+                                   </div>
+                               </div>
+                           </div>
+
+                           <div class="flex gap-4">
+                               <button type="button" onclick="prevStep(2)" class="w-1/3 bg-transparent border border-white/10 hover:border-white/30 text-on-surface-variant hover:text-white font-headline font-bold py-4 rounded-xl transition-colors">Atrás</button>
+                               <button type="button" id="submitBtn" onclick="submitForm()" class="w-2/3 bg-gradient-to-r from-primary to-secondary text-white font-headline font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:shadow-[0_0_25px_rgba(0,240,255,0.6)] hover:-translate-y-1 transition-all flex justify-center items-center gap-2 disabled:opacity-70 disabled:pointer-events-none">
+                                   Ejecutar Análisis
+                                   <span class="material-symbols-outlined text-sm">analytics</span>
+                               </button>
+                           </div>
+                       </div>
+                   </form>
+               </div>
+           </div>
+       </div>
+   </section>
+
+   <!-- Transparent Tech Stack -->
+   <section class="py-16 bg-surface border-y border-surface-container-highest text-center px-8">
+       <div class="max-w-6xl mx-auto">
+           <p class="text-xs font-headline font-bold text-outline tracking-[0.2em] uppercase mb-8">Nuestra Infraestructura Tecnológica</p>
+           <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 hover:opacity-100 transition-all duration-500">
+               <div class="text-xl font-headline font-bold flex items-center gap-2 text-on-surface"><span class="material-symbols-outlined text-secondary">psychology</span> Claude 3.5</div>
+               <div class="text-xl font-headline font-bold flex items-center gap-2 text-on-surface"><span class="material-symbols-outlined text-white">view_quilt</span> Framer</div>
+               <div class="text-xl font-headline font-bold flex items-center gap-2 text-on-surface"><span class="material-symbols-outlined text-primary">dynamic_form</span> Tally</div>
+               <div class="text-xl font-headline font-bold flex items-center gap-2 text-on-surface"><span class="material-symbols-outlined text-indigo-400">payments</span> Stripe</div>
+           </div>
+       </div>
+   </section>
+
+   <!-- Footer -->
+   <footer class="bg-surface-container-lowest border-t border-white/5">
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-8 py-12 max-w-7xl mx-auto">
+           <div class="space-y-4">
+               <div class="text-lg font-black text-on-surface font-headline flex items-center gap-2">
+                   <span class="material-symbols-outlined text-secondary">bolt</span>
+                   2horas<span class="text-secondary">.online</span>
+               </div>
+               <p class="font-body text-sm text-on-surface-variant max-w-xs">Diseñamos la infraestructura digital que tu negocio necesita para escalar sin fricciones en tiempo récord.</p>
+           </div>
+           <div class="grid grid-cols-2 gap-4">
+               <div class="space-y-3">
+                   <a class="block text-on-surface-variant hover:text-secondary font-body text-sm transition-colors" href="#">Términos</a>
+                   <a class="block text-on-surface-variant hover:text-secondary font-body text-sm transition-colors" href="#">Privacidad</a>
+               </div>
+               <div class="space-y-3">
+                   <a class="block text-on-surface-variant hover:text-secondary font-body text-sm transition-colors" href="#">X (Twitter)</a>
+                   <a class="block text-on-surface-variant hover:text-secondary font-body text-sm transition-colors" href="#">LinkedIn</a>
+               </div>
+           </div>
+           <div class="md:text-right flex items-end justify-end">
+               <div class="font-body text-sm text-outline">© 2026 2horas.online. Built for Speed.</div>
+           </div>
+       </div>
+   </footer>
+
+   <!-- === MODALES === -->
+   
+   <!-- Modal: Verificar si Califico (Requisitos) -->
+   <div id="qualifyModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-surface/80 backdrop-blur-sm px-4">
+       <div id="qualifyModalContent" class="bg-surface-container border border-white/10 rounded-[2rem] p-8 md:p-10 max-w-md w-full shadow-[0_0_50px_rgba(0,87,255,0.15)] transform scale-95 opacity-0 transition-all duration-300 relative">
+           <button onclick="closeModal('qualifyModal')" class="absolute top-6 right-6 text-on-surface-variant hover:text-white transition-colors">
+               <span class="material-symbols-outlined">close</span>
+           </button>
+           <div class="w-16 h-16 bg-primary/10 border border-primary/30 text-primary rounded-2xl flex items-center justify-center mb-6">
+               <span class="material-symbols-outlined text-3xl">fact_check</span>
+           </div>
+           <h3 class="font-headline text-2xl font-extrabold text-on-surface mb-2">Requisitos de Viabilidad</h3>
+           <p class="font-body text-on-surface-variant text-sm mb-6">Para garantizar la entrega en 2 horas, requerimos:</p>
+           
+           <ul class="font-body text-on-surface text-sm mb-8 space-y-4">
+               <li class="flex items-start gap-3">
+                   <span class="material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">check_circle</span> 
+                   <span><strong>Modelo definido:</strong> Servicios, portafolios o captación de leads. (No e-commerce grandes).</span>
+               </li>
+               <li class="flex items-start gap-3">
+                   <span class="material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">check_circle</span> 
+                   <span><strong>Rapidez de decisión:</strong> Disposición para aprobar diseños y textos en vivo durante la llamada.</span>
+               </li>
+               <li class="flex items-start gap-3">
+                   <span class="material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">check_circle</span> 
+                   <span><strong>Compromiso:</strong> Inversión base de $500.000 COP lista para ejecutar.</span>
+               </li>
+           </ul>
+           
+           <!-- Botón Entiendo -->
+           <button onclick="closeModal('qualifyModal')" class="w-full bg-gradient-to-r from-primary to-secondary text-white font-headline font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+               Entiendo
+           </button>
+       </div>
+   </div>
+
+   <!-- Modal: Cómo Funciona -->
+   <div id="howItWorksModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-surface/80 backdrop-blur-sm px-4">
+       <div id="howItWorksModalContent" class="bg-surface-container border border-white/10 rounded-[2rem] p-8 md:p-10 max-w-lg w-full shadow-[0_0_50px_rgba(0,240,255,0.15)] transform scale-95 opacity-0 transition-all duration-300 relative">
+           <button onclick="closeModal('howItWorksModal')" class="absolute top-6 right-6 text-on-surface-variant hover:text-white transition-colors">
+               <span class="material-symbols-outlined">close</span>
+           </button>
+           <div class="w-16 h-16 bg-secondary/10 border border-secondary/30 text-secondary rounded-2xl flex items-center justify-center mb-6">
+               <span class="material-symbols-outlined text-3xl">psychology</span>
+           </div>
+           <h3 class="font-headline text-2xl font-extrabold text-on-surface mb-3">El Objetivo & Proceso</h3>
+           <p class="font-body text-on-surface-variant text-sm mb-6 leading-relaxed">
+               Eliminamos las semanas de espera y los correos interminables. Construimos tu web en una <strong>videollamada intensiva de 2 horas</strong> usando IA y herramientas No-Code de alta gama.
+           </p>
+           
+           <div class="bg-surface-container-lowest border border-white/5 rounded-xl p-5 mb-8">
+               <div class="space-y-4 font-body text-sm text-on-surface-variant">
+                   <div class="flex gap-3">
+                       <strong class="text-white shrink-0">1. Pre-Work IA:</strong> 
+                       <span>Pasas el filtro y la IA estructura tu copy persuasivo antes de vernos.</span>
+                   </div>
+                   <div class="flex gap-3">
+                       <strong class="text-white shrink-0">2. Sesión en Vivo:</strong> 
+                       <span>Ensamblamos diseño, colores y arquitectura web juntos, pantalla compartida.</span>
+                   </div>
+                   <div class="flex gap-3">
+                       <strong class="text-white shrink-0">3. Despliegue:</strong> 
+                       <span>Publicamos el sitio y te entregamos accesos totales en la misma sesión.</span>
+                   </div>
+               </div>
+           </div>
+           
+           <button onclick="closeModal('howItWorksModal')" class="w-full bg-surface-container-high hover:bg-surface-container-highest border border-white/10 text-white font-headline font-bold py-4 rounded-xl transition-colors">
+               Entendido
+           </button>
+       </div>
+   </div>
+
+   <!-- Modal: Success Original -->
+   <div id="successModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-surface/80 backdrop-blur-sm px-4">
+       <div id="successModalContent" class="bg-surface-container border border-white/10 rounded-[2rem] p-8 md:p-12 max-w-lg w-full shadow-[0_0_50px_rgba(0,240,255,0.1)] transform scale-95 opacity-0 transition-all duration-300 relative">
+           <div class="w-20 h-20 bg-secondary/10 border border-secondary/30 text-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+               <span class="material-symbols-outlined text-4xl">mark_email_read</span>
+           </div>
+           <h3 class="font-headline text-3xl font-extrabold text-on-surface mb-4 text-center">¡Solicitud Recibida!</h3>
+           <p class="font-body text-on-surface-variant text-lg text-center mb-8">
+               Tu proyecto tiene el perfil ideal. <strong>Pronto te contactaremos</strong> al correo o teléfono proporcionado para establecer la fecha y hora de ejecución.
+           </p>
+           <button type="button" onclick="closeModalAndReload()" class="w-full bg-gradient-to-r from-primary to-secondary text-white font-headline font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+               Entendido
+               <span class="material-symbols-outlined text-sm">thumb_up</span>
+           </button>
+       </div>
+   </div>
+
+   <!-- JS Logic -->
+   <script>
+       const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwFubmfDGvRupTwWehSDlSg66xzbZy3H6mDMgq_5kR5Agop6Pn8Xz54zAzqxicYkWcZ/exec";
+
+       // === Lógica de Notificaciones Flotantes (Toasts) ===
+       let toastTimeout;
+       function showToast(message) {
+           const toast = document.getElementById('toast');
+           document.getElementById('toastMessage').innerText = message;
+           
+           // Limpiar timeout anterior si el usuario hace clic rápido
+           if (toastTimeout) clearTimeout(toastTimeout);
+           
+           // Mostrar
+           toast.classList.remove('translate-x-[150%]', 'opacity-0');
+           
+           // Ocultar después de 3.5 segundos
+           toastTimeout = setTimeout(() => {
+               toast.classList.add('translate-x-[150%]', 'opacity-0');
+           }, 3500);
+       }
+
+       // === Lógica de Modales ===
+       function openModal(modalId) {
+           const modal = document.getElementById(modalId);
+           const content = document.getElementById(modalId + 'Content');
+           modal.classList.remove('hidden');
+           modal.classList.add('flex');
+           setTimeout(() => {
+               content.classList.remove('scale-95', 'opacity-0');
+               content.classList.add('scale-100', 'opacity-100');
+           }, 10);
+       }
+
+       function closeModal(modalId) {
+           const modal = document.getElementById(modalId);
+           const content = document.getElementById(modalId + 'Content');
+           content.classList.remove('scale-100', 'opacity-100');
+           content.classList.add('scale-95', 'opacity-0');
+           setTimeout(() => {
+               modal.classList.remove('flex');
+               modal.classList.add('hidden');
+           }, 300);
+       }
+
+       // === Lógica de Formulario ===
+       function checkRejection(stepId) {
+           if (stepId === 1) {
+               const q1 = document.querySelector('input[name="q1"]:checked');
+               if (q1 && q1.value === 'reject') return true;
+           }
+           if (stepId === 3) {
+               const q7 = document.querySelector('input[name="q7"]:checked');
+               const q8 = document.querySelector('input[name="q8"]:checked');
+               if ((q7 && q7.value === 'reject') || (q8 && q8.value === 'reject')) return true;
+           }
+           return false;
+       }
+
+       function triggerRejection() {
+           document.getElementById('step1').classList.add('step-hidden');
+           document.getElementById('step2').classList.add('step-hidden');
+           document.getElementById('step3').classList.add('step-hidden');
+           document.getElementById('progressBar').parentElement.classList.add('hidden');
+           document.getElementById('rejectionMessage').classList.remove('hidden');
+           document.getElementById('rejectionMessage').classList.add('block');
+       }
+
+       function triggerSuccess() {
+           openModal('successModal');
+       }
+
+       function closeModalAndReload() {
+           location.reload();
+       }
+
+       function validateStep(stepId) {
+           if (stepId === 1) {
+               const nombre = document.getElementById('nombre').value;
+               const email = document.getElementById('email').value;
+               const telefono = document.getElementById('telefono').value;
+              
+               if (!nombre || !email || !telefono) {
+                   showToast('Por favor completa tus datos de contacto básicos.');
+                   return false;
+               }
+              
+               if (!document.querySelector('input[name="q1"]:checked') || !document.querySelector('input[name="q2"]:checked')) {
+                   showToast('Por favor responde las preguntas de viabilidad para continuar.');
+                   return false;
+               }
+           }
+           if (stepId === 3) { 
+               if (!document.querySelector('input[name="q7"]:checked') || !document.querySelector('input[name="q8"]:checked')) {
+                   showToast('Por favor responde todas las preguntas para ejecutar el análisis.');
+                   return false;
+               }
+           }
+           return true;
+       }
+
+       function nextStep(targetStep) {
+           const currentStep = targetStep - 1;
+           if (!validateStep(currentStep)) return;
+           if (checkRejection(currentStep)) { triggerRejection(); return; }
+           
+           document.getElementById('step' + currentStep).classList.add('step-hidden');
+           document.getElementById('step' + targetStep).classList.remove('step-hidden');
+          
+           const progress = (targetStep / 3) * 100;
+           document.getElementById('progressBar').style.width = progress + '%';
+       }
+
+       function prevStep(targetStep) {
+           const currentStep = targetStep + 1;
+           document.getElementById('step' + currentStep).classList.add('step-hidden');
+           document.getElementById('step' + targetStep).classList.remove('step-hidden');
+          
+           const progress = (targetStep / 3) * 100;
+           document.getElementById('progressBar').style.width = progress + '%';
+       }
+
+       async function submitForm() {
+           if (!validateStep(3)) return;
+
+           const isRejected = checkRejection(3);
+           const btn = document.getElementById('submitBtn');
+           const originalBtnHTML = btn.innerHTML;
+
+           btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Procesando...';
+           btn.disabled = true;
+
+           const form = document.getElementById('qualifyForm');
+           const formData = new FormData(form);
+           formData.append('estado', isRejected ? 'Rechazado' : 'Aprobado');
+
+           try {
+               if (GOOGLE_SCRIPT_URL !== "URL_DE_TU_SCRIPT_AQUI") {
+                   await fetch(GOOGLE_SCRIPT_URL, {
+                       method: 'POST',
+                       body: formData,
+                       mode: 'no-cors' 
+                   });
+               }
+           } catch (error) {
+               console.error('Error al enviar los datos:', error);
+           }
+
+           btn.innerHTML = originalBtnHTML;
+           btn.disabled = false;
+
+           if (isRejected) {
+               triggerRejection();
+           } else {
+               triggerSuccess();
+           }
+       }
+   </script>
+
+   <!-- Botón Flotante de WhatsApp -->
+   <a href="https://wa.me/573000000000?text=Hola,%20tengo%20una%20duda%20sobre%20el%20servicio%20de%202horas.online" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-[90] flex items-center gap-3 group">
+       <div class="bg-surface-container border border-white/10 px-4 py-2 rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)] text-sm font-bold text-white opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0 pointer-events-none">
+           Hablar con un asesor
+       </div>
+       <div class="bg-[#25D366] hover:bg-[#128C7E] text-white p-4 rounded-full shadow-[0_0_20px_rgba(37,211,102,0.4)] transition-transform duration-300 hover:scale-110 flex items-center justify-center">
+           <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+           </svg>
+       </div>
+   </a>
+</body>
+</html>
